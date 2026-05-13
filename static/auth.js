@@ -77,12 +77,13 @@ class AuthManager {
         
         const email = this.emailInput.value.trim();
         const password = this.passwordInput.value;
+        const API_BASE_URL = 'https://bookspace-aw3i.onrender.com';
         
         // Show loading state
         this.setLoading(true);
         
         try {
-            const response = await fetch('/api/auth/login', {
+            const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
