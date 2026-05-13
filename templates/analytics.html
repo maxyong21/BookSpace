@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard - BookSpace</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='analytics.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div class="analytics-page">
+        <!-- Header -->
+        <div class="analytics-header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-chart-line"></i>
+                    <h1>Analytics Dashboard</h1>
+                </div>
+                <div class="header-actions">
+                    <div class="date-range">
+                        <label><i class="fas fa-calendar"></i> Date Range:</label>
+                        <select id="dateRangeSelect">
+                            <option value="7">Last 7 days</option>
+                            <option value="14">Last 14 days</option>
+                            <option value="30" selected>Last 30 days</option>
+                            <option value="90">Last 90 days</option>
+                            <option value="all">All Time</option>
+                        </select>
+                    </div>
+                    <button id="refreshBtn" class="btn-refresh">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                    <button id="exportBtn" class="btn-export">
+                        <i class="fas fa-download"></i> Export Report
+                    </button>
+                    <a href="/admin/dashboard" class="btn-back">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="metric-info">
+                    <h3 id="totalBookings">0</h3>
+                    <p>Total Bookings</p>
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="metric-info">
+                    <h3 id="totalResources">0</h3>
+                    <p>Total Resources</p>
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="metric-info">
+                    <h3 id="totalUsers">0</h3>
+                    <p>Active Users</p>
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="metric-info">
+                    <h3 id="bookingRate">0%</h3>
+                    <p>Booking Rate</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid">
+            <div class="chart-container full-width">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-line"></i> Booking Trends Over Time</h3>
+                    <p>Daily booking volume trend analysis</p>
+                </div>
+                <canvas id="trendChart" height="300"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-bar"></i> Most Popular Resources</h3>
+                    <p>Top 10 most booked resources</p>
+                </div>
+                <canvas id="popularityChart" height="300"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-pie"></i> Booking Status</h3>
+                    <p>Confirmed vs Cancelled bookings</p>
+                </div>
+                <canvas id="statusChart" height="300"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3><i class="fas fa-clock"></i> Peak Hours Analysis</h3>
+                    <p>Most popular booking hours</p>
+                </div>
+                <canvas id="peakHoursChart" height="300"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3><i class="fas fa-calendar-week"></i> Weekday Analysis</h3>
+                    <p>Busiest days of the week</p>
+                </div>
+                <canvas id="weekdayChart" height="300"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-line"></i> Resource Type Distribution</h3>
+                    <p>Bookings by resource category</p>
+                </div>
+                <canvas id="typeChart" height="300"></canvas>
+            </div>
+        </div>
+
+        <!-- Top Users Section -->
+        <div class="top-users-section">
+            <div class="section-header">
+                <h3><i class="fas fa-trophy"></i> Top Active Users</h3>
+                <p>Users with most bookings</p>
+            </div>
+            <div id="topUsersContainer" class="top-users-list">
+                <div class="loading-state">Loading top users...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastMsg" class="toast-message"></div>
+
+    <script src="{{ url_for('static', filename='analytics.js') }}"></script>
+</body>
+</html>

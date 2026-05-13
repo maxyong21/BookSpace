@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookSpace | Smart Resource Booking System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <input type="hidden" id="userRole" value="{{ role }}">
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-calendar-alt"></i>
+                <span>BookSpace</span>
+            </div>
+            <div class="nav-menu">
+                <div class="user-greeting">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Welcome, {{ user }}!</span>
+                    <span class="role-badge {{ role }}">{{ role }}</span>
+                </div>
+                <div class="nav-actions">
+                    {% if role != 'admin' %}
+                    <a href="/dashboard" class="nav-btn">
+                        <i class="fas fa-calendar-check"></i> My Bookings
+                    </a>
+                    {% endif %}
+                    {% if role == 'admin' %}
+                    <a href="/admin/dashboard" class="nav-btn admin">
+                        <i class="fas fa-cog"></i> Admin Dashboard
+                    </a>
+                    {% endif %}
+                    <button id="logoutBtn" class="nav-btn logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+            <div class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero-section">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-bolt"></i> Smart Booking System
+            </div>
+            <h1>Book Your Perfect<br><span class="gradient-text">Workspace</span></h1>
+            <p>Secure meeting rooms, lab equipment, and study pods in seconds — no more double bookings or confusion.</p>
+            <div class="hero-stats">
+                <div class="stat">
+                    <i class="fas fa-building"></i>
+                    <span>6+ Resources</span>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-users"></i>
+                    <span>100+ Bookings</span>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-clock"></i>
+                    <span>24/7 Access</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-image">
+            <i class="fas fa-calendar-check"></i>
+        </div>
+    </section>
+
+    <div class="search-section">
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search resources by name...">
+            </div>
+            <div class="filter-wrapper">
+                <div class="filter-label">
+                    <i class="fas fa-filter"></i> Filter by:
+                </div>
+                <div class="filter-buttons" id="filterContainer">
+                    <button class="filter-btn active" data-filter="all">
+                        <i class="fas fa-th-large"></i> All
+                    </button>
+                    <button class="filter-btn" data-filter="Meeting Rooms">
+                        <i class="fas fa-chalkboard-user"></i> Meeting Rooms
+                    </button>
+                    <button class="filter-btn" data-filter="Lab Equipment">
+                        <i class="fas fa-microscope"></i> Lab Equipment
+                    </button>
+                    <button class="filter-btn" data-filter="Study Pods">
+                        <i class="fas fa-person-booth"></i> Study Pods
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="resources-section">
+        <div class="section-header">
+            <h2><i class="fas fa-cubes"></i> Available Resources</h2>
+            <p id="resultsCount">Loading resources...</p>
+        </div>
+        <div id="cardsContainer" class="cards-grid">
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <p>Loading available resources...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-calendar-plus"></i> Book Resource</h2>
+                <span class="close">&times;</span>
+            </div>
+            <form id="bookingForm">
+                <input type="hidden" id="resourceId">
+                <div class="form-group">
+                    <label><i class="fas fa-building"></i> Resource</label>
+                    <input type="text" id="resourceName" readonly>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Your Name</label>
+                        <input type="text" id="userName" placeholder="Enter your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" id="userEmail" placeholder="your@email.com" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> Date</label>
+                        <input type="date" id="bookingDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-clock"></i> Start Time</label>
+                        <input type="time" id="startTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-clock"></i> End Time</label>
+                        <input type="time" id="endTime" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-pen"></i> Purpose (optional)</label>
+                    <textarea id="purpose" rows="3" placeholder="What's this booking for?"></textarea>
+                </div>
+                <div class="booking-summary" id="bookingSummary" style="display: none;">
+                    <i class="fas fa-info-circle"></i>
+                    <span id="summaryText"></span>
+                </div>
+                <button type="submit" class="submit-booking">
+                    <i class="fas fa-check-circle"></i> Confirm Booking
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="successModal" class="modal">
+        <div class="modal-content success-modal">
+            <i class="fas fa-check-circle success-icon"></i>
+            <h2>Booking Confirmed!</h2>
+            <p id="successMessage">Your booking has been successfully created.</p>
+            <button class="btn-close-modal" onclick="closeSuccessModal()">
+                <i class="fas fa-thumbs-up"></i> Great!
+            </button>
+        </div>
+    </div>
+
+    <div id="toastMsg" class="toast-message"></div>
+
+    <button id="backToTop" class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
