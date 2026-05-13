@@ -110,7 +110,7 @@ class AuthManager {
                 
                 // Redirect after short delay
                 setTimeout(() => {
-                    window.location.href = '/';
+                    window.location.href = 'BookSpace/homepage';
                 }, 1000);
                 
             } else {

@@ -177,7 +177,7 @@ class RegisterManager {
                 
                 // Redirect after 1.5 seconds
                 setTimeout(() => {
-                    window.location.href = '/login';
+                    window.location.href = 'BookSpace/index';
                 }, 1500);
             } else {
                 this.showToast(data.error || 'Registration failed. Please try again.', 'error');

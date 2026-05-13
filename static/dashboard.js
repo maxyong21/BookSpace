@@ -301,7 +301,7 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
         const response = await fetch('/api/auth/logout', { method: 'POST' });
         const data = await response.json();
         if (data.success) {
-            window.location.href = '/login';
+            window.location.href = 'BookSpace/index';
         }
     } catch (error) {
         console.error('Logout failed:', error);
