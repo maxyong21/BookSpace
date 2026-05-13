@@ -8,24 +8,23 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Add authentication check -->
+    <script src="static/config.js"></script>
     <script>
-        // Check if user is logged in
         async function checkAuth() {
             try {
-                const response = await fetch('/api/auth/me');
+                // Use API_BASE_URL from config
+                const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+                    credentials: 'include'
+                });
                 const data = await response.json();
                 
                 if (!data.success) {
-                    // Not logged in, redirect to login page
-                    window.location.href = 'BookSpace/index';
+                    window.location.href = 'index.html';
                     return false;
                 }
                 
-                // Update user info if needed
                 if (data.user) {
                     document.getElementById('userRole').value = data.user.role;
-                    // You can also update the greeting dynamically
                     const userGreeting = document.querySelector('.user-greeting span');
                     if (userGreeting) {
                         userGreeting.textContent = `Welcome, ${data.user.name}!`;
@@ -34,12 +33,11 @@
                 return true;
             } catch (error) {
                 console.error('Auth check failed:', error);
-                window.location.href = 'BookSpace/index';
+                window.location.href = 'index.html';
                 return false;
             }
         }
         
-        // Run auth check immediately
         checkAuth();
     </script>
     <input type="hidden" id="userRole" value="{{ role }}">

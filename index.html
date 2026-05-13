@@ -31,14 +31,8 @@
                     <label for="password">
                         <i class="fas fa-lock"></i> Password
                     </label>
-                    <div class="password-wrapper">
-                        <input type="password" id="password" name="password" required 
-                               placeholder="Enter your password" autocomplete="current-password">
-                    </div>
-                </div>
-                
-                <div class="form-options">
-                    <a href="#" id="forgotPassword" class="forgot-link">Forgot password?</a>
+                    <input type="password" id="password" name="password" required 
+                           placeholder="Enter your password" autocomplete="current-password">
                 </div>
                 
                 <button type="submit" class="btn-submit" id="loginBtn">
@@ -50,12 +44,11 @@
             </form>
             
             <div class="auth-footer">
-                <p>Don't have an account? <a href="/register">Create an account</a></p>
+                <p>Don't have an account? <a href="register.html">Create an account</a></p>
             </div>
         </div>
     </div>
     
-    <!-- Toast Notification -->
     <div id="toastMsg" class="toast-message"></div>
     
     <script src="static/auth.js"></script>

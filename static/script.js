@@ -1,3 +1,5 @@
+const API_BASE_URL = 'https://bookspace-aw3i.onrender.com';
+
 let currentResources = [];
 let searchTerm = '';
 let currentFilter = 'all';
@@ -78,7 +80,7 @@ async function renderCalendar() {
     title.textContent = `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
     
     try {
-        const response = await fetch('/api/bookings/all');
+        const response = await fetch(`${API_BASE_URL}/api/bookings/all`);
         const data = await response.json();
         const bookings = data.success ? data.data : [];
         
@@ -204,7 +206,7 @@ async function loadBookedSlots(resourceId, date) {
     summaryDiv.style.background = '#e0e7ff';
     
     try {
-        const response = await fetch('/api/bookings/all');
+        const response = await fetch(`${API_BASE_URL}/api/bookings/all`);
         const data = await response.json();
         
         if (data.success) {
@@ -234,7 +236,7 @@ async function loadBookedSlots(resourceId, date) {
 
 async function checkTimeSlotAvailability(resourceId, date, startTime, endTime) {
     try {
-        const response = await fetch('/api/bookings/check', {
+        const response = await fetch(`${API_BASE_URL}/api/bookings/check`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -312,7 +314,7 @@ async function loadResources() {
     container.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Loading available resources...</p></div>';
     
     try {
-        const url = currentFilter === 'all' ? '/api/resources' : `/api/resources?type=${encodeURIComponent(currentFilter)}`;
+        const url = currentFilter === 'all' ? `${API_BASE_URL}/api/resources` : `${API_BASE_URL}/api/resources?type=${encodeURIComponent(currentFilter)}`;
         const response = await fetch(url);
         const data = await response.json();
         
@@ -590,7 +592,7 @@ document.getElementById('bookingForm')?.addEventListener('submit', async (e) => 
     submitBtn.disabled = true;
     
     try {
-        const response = await fetch('/api/bookings', {
+        const response = await fetch(`${API_BASE_URL}/api/bookings`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(bookingData)
@@ -637,10 +639,10 @@ function closeSuccessModal() {
 
 async function logout() {
     try {
-        const response = await fetch('/api/auth/logout', { method: 'POST' });
+        const response = await fetch(`${API_BASE_URL}/api/auth/logout`, { method: 'POST' });
         const data = await response.json();
         if (data.success) {
-            window.location.href = 'BookSpace/index';
+            window.location.href = 'index.html';
         }
     } catch (error) {
         console.error('Logout failed:', error);
