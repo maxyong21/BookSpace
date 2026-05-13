@@ -6,8 +6,9 @@ from datetime import datetime
 import functools
 
 app = Flask(__name__, 
-            template_folder='.',  # Look in current/root directory
-            static_folder='static')  # Static files are in static folder
+            template_folder='.',  
+            static_folder='static')
+
 app.secret_key = 'your-secret-key-here-change-in-production-2026'
 app.config['SESSION_COOKIE_SAMESITE'] = 'None'
 app.config['SESSION_COOKIE_SECURE'] = True
@@ -20,13 +21,12 @@ CORS(app,
          'http://localhost:5000',
          'http://127.0.0.1:5000',
          'https://bookspace-aw3i.onrender.com',
-         'https://maxyong21.github.io/BookSpace'
+         'https://maxyong21.github.io'
      ],
      allow_headers=['Content-Type', 'Authorization', 'X-Requested-With'],
      expose_headers=['Content-Type', 'X-Requested-With'],
      methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
 
-db = Database()
 db = Database()
 
 def login_required(f):
@@ -47,23 +47,20 @@ def admin_required(f):
 
 @app.route('/')
 def index():
-    """Main page - Admin goes to dashboard, Customer goes to resources"""
-    if 'user_id' in session:
-        # If user is admin, redirect to admin dashboard
-        if session.get('role') == 'admin':
-            return redirect(url_for('admin_dashboard'))
-        # Regular customers go to resources page
-        return render_template('index.html', user=session.get('user_name'), role=session.get('role'))
+    """Main page - redirects to login"""
     return redirect(url_for('login_page'))
 
 @app.route('/login')
 def login_page():
+    """Login page - serves index.html"""
     return render_template('index.html')
 
 @app.route('/register')
 def register_page():
+    """Register page"""
     return render_template('register.html')
 
+# API Routes
 @app.route('/api/auth/register', methods=['POST'])
 def register():
     data = request.json
@@ -89,8 +86,12 @@ def register():
     else:
         return jsonify({'success': False, 'error': 'Registration failed'}), 500
 
-@app.route('/api/auth/login', methods=['POST'])
+@app.route('/api/auth/login', methods=['POST', 'OPTIONS'])
 def login():
+    """Login API endpoint"""
+    if request.method == 'OPTIONS':
+        return _build_cors_preflight_response()
+    
     data = request.json
     email = data.get('email')
     password = data.get('password')
@@ -346,6 +347,14 @@ def resources_page():
     """Resources page for admin to view (but not book)"""
     return render_template('index.html', user=session.get('user_name'), role=session.get('role'))
 
+def _build_cors_preflight_response():
+    response = jsonify({'status': 'ok'})
+    response.headers.add('Access-Control-Allow-Origin', 'https://maxyong21.github.io')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+    response.headers.add('Access-Control-Allow-Methods', 'POST')
+    return response
+
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))  # Render provides PORT variable
+    port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
