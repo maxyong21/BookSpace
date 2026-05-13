@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from flask_cors import CORS
 from database import Database
@@ -327,4 +328,5 @@ def resources_page():
     return render_template('index.html', user=session.get('user_name'), role=session.get('role'))
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get('PORT', 5000))  # Render provides PORT variable
+    app.run(host='0.0.0.0', port=port)
