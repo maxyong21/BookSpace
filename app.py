@@ -9,7 +9,24 @@ app = Flask(__name__,
             template_folder='.',  # Look in current/root directory
             static_folder='static')  # Static files are in static folder
 app.secret_key = 'your-secret-key-here-change-in-production-2026'
-CORS(app, supports_credentials=True, origins=['*'])
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+
+# Configure CORS properly for cross-domain requests
+CORS(app, 
+     supports_credentials=True,
+     origins=[
+         'http://localhost:5000',
+         'http://127.0.0.1:5000',
+         'https://bookspace-aw3i.onrender.com',
+         'https://maxyong21.github.io/BookSpace'
+     ],
+     allow_headers=['Content-Type', 'Authorization', 'X-Requested-With'],
+     expose_headers=['Content-Type', 'X-Requested-With'],
+     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
+
+db = Database()
 db = Database()
 
 def login_required(f):

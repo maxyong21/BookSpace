@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,41 +8,75 @@
     <link rel="stylesheet" href="static/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
+
 <body>
     <script src="static/config.js"></script>
     <script>
+        const API_BASE_URL = window.API_BASE_URL || 'https://bookspace-aw3i.onrender.com';
+
+        let currentUser = null;
+
         async function checkAuth() {
             try {
-                // Use API_BASE_URL from config
+                // Add a small delay to ensure cookie is set
+                await new Promise(resolve => setTimeout(resolve, 100));
+
                 const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
-                    credentials: 'include'
+                    credentials: 'include',
+                    mode: 'cors'
                 });
                 const data = await response.json();
-                
+
+                console.log('Auth check response:', data); // Debug log
+
                 if (!data.success) {
+                    console.log('Not authenticated, redirecting to login');
                     window.location.href = 'index.html';
                     return false;
                 }
-                
-                if (data.user) {
-                    document.getElementById('userRole').value = data.user.role;
-                    const userGreeting = document.querySelector('.user-greeting span');
-                    if (userGreeting) {
-                        userGreeting.textContent = `Welcome, ${data.user.name}!`;
-                    }
-                }
+
+                currentUser = data.user;
+                updateUserInterface(currentUser);
                 return true;
+
             } catch (error) {
                 console.error('Auth check failed:', error);
                 window.location.href = 'index.html';
                 return false;
             }
         }
-        
+
+        function updateUserInterface(user) {
+            // Update user greeting
+            const greetingSpan = document.querySelector('.user-greeting .user-name');
+            if (greetingSpan) {
+                greetingSpan.textContent = user.name;
+            }
+
+            // Update role badge
+            const roleBadge = document.querySelector('.user-greeting .role-badge');
+            if (roleBadge) {
+                roleBadge.textContent = user.role;
+                roleBadge.classList.add(user.role);
+            }
+
+            // Show/hide admin buttons
+            const adminBtn = document.querySelector('.nav-btn.admin');
+            const myBookingsBtn = document.querySelector('.nav-btn.bookings');
+
+            if (user.role === 'admin') {
+                if (adminBtn) adminBtn.style.display = 'inline-flex';
+                if (myBookingsBtn) myBookingsBtn.style.display = 'none';
+            } else {
+                if (adminBtn) adminBtn.style.display = 'none';
+                if (myBookingsBtn) myBookingsBtn.style.display = 'inline-flex';
+            }
+        }
+
+        // Run auth check
         checkAuth();
     </script>
-    <input type="hidden" id="userRole" value="{{ role }}">
-    
+
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-brand">
@@ -51,20 +86,16 @@
             <div class="nav-menu">
                 <div class="user-greeting">
                     <i class="fas fa-user-circle"></i>
-                    <span>Welcome, {{ user }}!</span>
-                    <span class="role-badge {{ role }}">{{ role }}</span>
+                    <span class="user-name">Loading...</span>
+                    <span class="role-badge"></span>
                 </div>
                 <div class="nav-actions">
-                    {% if role != 'admin' %}
-                    <a href="/dashboard" class="nav-btn">
+                    <a href="dashboard.html" class="nav-btn bookings" style="display: none;">
                         <i class="fas fa-calendar-check"></i> My Bookings
                     </a>
-                    {% endif %}
-                    {% if role == 'admin' %}
-                    <a href="/admin/dashboard" class="nav-btn admin">
+                    <a href="admin_dashboard.html" class="nav-btn admin" style="display: none;">
                         <i class="fas fa-cog"></i> Admin Dashboard
                     </a>
-                    {% endif %}
                     <button id="logoutBtn" class="nav-btn logout">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </button>
@@ -82,7 +113,8 @@
                 <i class="fas fa-bolt"></i> Smart Booking System
             </div>
             <h1>Book Your Perfect<br><span class="gradient-text">Workspace</span></h1>
-            <p>Secure meeting rooms, lab equipment, and study pods in seconds — no more double bookings or confusion.</p>
+            <p>Secure meeting rooms, lab equipment, and study pods in seconds — no more double bookings or confusion.
+            </p>
             <div class="hero-stats">
                 <div class="stat">
                     <i class="fas fa-building"></i>
@@ -159,11 +191,11 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label><i class="fas fa-user"></i> Your Name</label>
-                        <input type="text" id="userName" placeholder="Enter your full name" required>
+                        <input type="text" id="userName" required>
                     </div>
                     <div class="form-group">
                         <label><i class="fas fa-envelope"></i> Email</label>
-                        <input type="email" id="userEmail" placeholder="your@email.com" required>
+                        <input type="email" id="userEmail" required>
                     </div>
                 </div>
                 <div class="form-row">
@@ -183,10 +215,6 @@
                 <div class="form-group">
                     <label><i class="fas fa-pen"></i> Purpose (optional)</label>
                     <textarea id="purpose" rows="3" placeholder="What's this booking for?"></textarea>
-                </div>
-                <div class="booking-summary" id="bookingSummary" style="display: none;">
-                    <i class="fas fa-info-circle"></i>
-                    <span id="summaryText"></span>
                 </div>
                 <button type="submit" class="submit-booking">
                     <i class="fas fa-check-circle"></i> Confirm Booking
@@ -213,5 +241,20 @@
     </button>
 
     <script src="static/script.js"></script>
+    <script>
+        // Logout functionality
+        document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+            try {
+                await fetch(`${API_BASE_URL}/api/auth/logout`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Logout failed:', error);
+            }
+        });
+    </script>
 </body>
+
 </html>

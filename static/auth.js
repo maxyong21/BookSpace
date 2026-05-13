@@ -1,4 +1,4 @@
-// auth.js - Login Functionality
+// auth.js - Updated version
 
 const API_BASE_URL = 'https://bookspace-aw3i.onrender.com';
 
@@ -14,6 +14,28 @@ class AuthManager {
     
     init() {
         this.setupEventListeners();
+        // Check if already logged in
+        this.checkExistingSession();
+    }
+    
+    async checkExistingSession() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+                credentials: 'include'
+            });
+            const data = await response.json();
+            
+            if (data.success && data.user) {
+                // Already logged in, redirect
+                if (data.user.role === 'admin') {
+                    window.location.href = 'admin_dashboard.html';
+                } else {
+                    window.location.href = 'homepage.html';
+                }
+            }
+        } catch (error) {
+            console.log('Not logged in');
+        }
     }
     
     setupEventListeners() {
@@ -50,7 +72,8 @@ class AuthManager {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ email, password }),
-                credentials: 'include'
+                credentials: 'include',
+                mode: 'cors'
             });
             
             const data = await response.json();
@@ -61,6 +84,16 @@ class AuthManager {
                 }
                 
                 this.showToast(data.message || 'Login successful! Redirecting...', 'success');
+                
+                // Verify the session is saved
+                const verifyResponse = await fetch(`${API_BASE_URL}/api/auth/me`, {
+                    credentials: 'include'
+                });
+                const verifyData = await verifyResponse.json();
+                
+                if (verifyData.success) {
+                    console.log('Session verified for:', verifyData.user.name);
+                }
                 
                 setTimeout(() => {
                     if (data.user && data.user.role === 'admin') {
