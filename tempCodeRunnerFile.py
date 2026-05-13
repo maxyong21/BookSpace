@@ -5,9 +5,7 @@ from database import Database
 from datetime import datetime
 import functools
 
-app = Flask(__name__, 
-            template_folder='.',  # Look in current/root directory
-            static_folder='static')  # Static files are in static folder
+app = Flask(__name__)
 app.secret_key = 'your-secret-key-here-change-in-production-2026'
 CORS(app)
 db = Database()
